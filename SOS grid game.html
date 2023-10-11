@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SOS Game</title>
+</head>
+<body>
+    <h1>SOS Game</h1>
+    <div id="game-board"></div>
+    <p id="current-player"></p>
+    <button id="reset-button">Reset</button>
+
+    <script>
+        // Variables
+        const boardSize = 3; // 3x3 grid
+        const board = new Array(boardSize);
+        for (let i = 0; i < boardSize; i++) {
+            board[i] = new Array(boardSize).fill('');
+        }
+        let currentPlayer = 'S';
+
+        // Functions
+        function createBoard() {
+            const gameBoard = document.getElementById('game-board');
+
+            for (let row = 0; row < boardSize; row++) {
+                for (let col = 0; col < boardSize; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    cell.addEventListener('click', handleCellClick);
+                    gameBoard.appendChild(cell);
+                }
+            }
+        }
+
+        function handleCellClick(event) {
+            const cell = event.target;
+            const row = cell.dataset.row;
+            const col = cell.dataset.col;
+
+            if (board[row][col] === '') {
+                board[row][col] = currentPlayer;
+                cell.textContent = currentPlayer;
+
+                if (checkWin(row, col, currentPlayer)) {
+                    alert(currentPlayer + ' wins!');
+                    resetGame();
+                } else {
+                    currentPlayer = currentPlayer === 'S' ? 'O' : 'S';
+                    document.getElementById('current-player').textContent = 'Current Player: ' + currentPlayer;
+                }
+            }
+        }
+
+        function checkWin(row, col, player) {
+            // Check horizontally, vertically, and diagonally for SOS
+            if (
+                (board[row][col - 1] === player && board[row][col + 1] === player) ||
+                (board[row - 1] && board[row - 1][col] === player && board[row + 1] && board[row + 1][col] === player) ||
+                (board[row - 1] && board[row - 1][col - 1] === player && board[row + 1] && board[row + 1][col + 1] === player) ||
+                (board[row - 1] && board[row - 1][col + 1] === player && board[row + 1] && board[row + 1][col - 1] === player)
+            ) {
+                return true;
+            }
+            return false;
+        }
+
+        function resetGame() {
+            for (let row = 0; row < boardSize; row++) {
+                for (let col = 0; col < boardSize; col++) {
+                    board[row][col] = '';
+                    const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                    cell.textContent = '';
+                }
+            }
+            currentPlayer = 'S';
+            document.getElementById('current-player').textContent = 'Current Player: ' + currentPlayer;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createBoard();
+            document.getElementById('current-player').textContent = 'Current Player: ' + currentPlayer;
+            document.getElementById('reset-button').addEventListener('click', resetGame);
+        });
+    </script>
+</body>
+</html>
